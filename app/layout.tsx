@@ -9,7 +9,9 @@ export const metadata: Metadata = {
   title: "XdpSam - Cosmic Portfolio",
   description:
     "Interactive galaxy portfolio showcasing full-stack development projects and skills by Saurabh Wankhede (XdpSam)",
-    generator: 'v0.dev'
+  icons: {
+    icon: "/profile-image.jpg", // Use the user's profile image as the favicon
+  },
 }
 
 export default function RootLayout({
