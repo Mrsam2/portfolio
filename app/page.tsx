@@ -11,7 +11,7 @@ import NavigationHUD from "@/components/navigation-hud"
 import WelcomeSequence from "@/components/welcome-sequence"
 import MobileMenu from "@/components/mobile-menu"
 import { Button } from "@/components/ui/button"
-import { Terminal, Github, Linkedin, Mail, Menu, X } from "lucide-react"
+import { Terminal, Github, Linkedin, Mail, Menu, X, Download } from "lucide-react" // Changed Bot to Download
 import { useMediaQuery } from "@/hooks/use-media-query"
 
 // Dynamically import Canvas and its children with SSR disabled
@@ -30,6 +30,7 @@ export default function CosmicPortfolio() {
   const [showWelcome, setShowWelcome] = useState(true)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [galaxyLoaded, setGalaxyLoaded] = useState(false)
+  // Removed showSplineBot state
 
   const isMobile = useMediaQuery("(max-width: 768px)")
   const isTablet = useMediaQuery("(max-width: 1024px)")
@@ -63,13 +64,14 @@ export default function CosmicPortfolio() {
           }}
           performance={{ min: 0.5 }}
         >
-          <ambientLight intensity={0.2} />
-          <pointLight position={[10, 10, 10]} intensity={0.5} />
+          <ambientLight intensity={0.5} /> {/* Increased ambient light */}
+          <pointLight position={[10, 10, 10]} intensity={1.5} /> {/* Increased point light */}
+          {/* Starfield – higher factor for brighter stars */}
           <DynamicStars
             radius={300}
             depth={50}
             count={isMobile ? 2000 : 5000}
-            factor={4}
+            factor={6}
             saturation={0}
             fade
             speed={1}
@@ -92,7 +94,7 @@ export default function CosmicPortfolio() {
       </div>
 
       {/* Mobile Menu Toggle */}
-      {isMobile && (
+      {isMobile && !showTerminal && (
         <motion.div
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: galaxyLoaded ? 1 : 0, scale: galaxyLoaded ? 1 : 0 }}
@@ -175,13 +177,24 @@ export default function CosmicPortfolio() {
         </div>
       </motion.div>
 
-      {/* Terminal Toggle - Responsive */}
+      {/* Terminal Toggle and Download CV Button - Responsive */}
       <motion.div
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: galaxyLoaded ? 1 : 0, y: galaxyLoaded ? 0 : 100 }}
         transition={{ delay: 1.5, duration: 1 }}
-        className={`absolute ${isMobile ? "bottom-4 left-4" : "bottom-6 right-6"}`}
+        className={`absolute bottom-6 ${isMobile ? "left-4 right-4 flex justify-center gap-2" : "left-6 flex gap-4"}`}
       >
+        <Button
+          asChild
+          className={`bg-black/80 backdrop-blur-md border border-purple-500/50 text-purple-400 hover:bg-purple-500/20 ${
+            isMobile ? "text-xs px-3 py-2" : ""
+          }`}
+        >
+          <a href="/Saurabh_Wankhede_Resume.pdf" download="Saurabh_Wankhede_Resume.pdf">
+            <Download className={`${isMobile ? "w-3 h-3 mr-1" : "w-4 h-4 mr-2"}`} />
+            {isMobile ? "Resume" : "Download CV"}
+          </a>
+        </Button>
         <Button
           onClick={() => setShowTerminal(!showTerminal)}
           className={`bg-black/80 backdrop-blur-md border border-green-500/50 text-green-400 hover:bg-green-500/20 ${
