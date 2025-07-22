@@ -7,11 +7,10 @@ if (typeof window !== "undefined") {
   window.TROIKA_DISABLE_WASM = true
 }
 
-import { useState } from "react"
-import { useRef } from "react"
-import { useFrame } from "@react-three/fiber"
-import { Text, useTexture } from "@react-three/drei" // Added useTexture
-import type * as THREE from "three"
+import { useState, useRef, Suspense } from "react" // Added Suspense
+import { useFrame, useLoader } from "@react-three/fiber" // Added useLoader
+import { Text } from "@react-three/drei"
+import * as THREE from "three" // Import THREE for TextureLoader
 
 const projects = [
   {
@@ -111,7 +110,7 @@ function CelestialObject({
 }: { project: any; onClick: (project: any) => void; isMobile: boolean }) {
   const meshRef = useRef<THREE.Mesh>(null)
   const [hovered, setHovered] = useState(false)
-  const texture = useTexture(project.texturePath) // Load the texture
+  const texture = useLoader(THREE.TextureLoader, project.texturePath) // Changed to useLoader with THREE.TextureLoader
 
   useFrame((state) => {
     if (meshRef.current) {
@@ -224,7 +223,11 @@ export default function GalaxyScene({
 
       {/* Projects as celestial objects with new textures */}
       {mobileProjects.map((project) => (
-        <CelestialObject key={project.id} project={project} onClick={onProjectClick} isMobile={isMobile} />
+        <Suspense key={project.id} fallback={null}>
+          {" "}
+          {/* Wrap each CelestialObject in Suspense */}
+          <CelestialObject project={project} onClick={onProjectClick} isMobile={isMobile} />
+        </Suspense>
       ))}
 
       {/* Skills constellation - Maintained */}
