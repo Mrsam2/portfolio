@@ -8,9 +8,9 @@ if (typeof window !== "undefined") {
 }
 
 import { useState } from "react"
-import { useRef, useMemo } from "react"
+import { useRef } from "react"
 import { useFrame } from "@react-three/fiber"
-import { Text, Sphere, Box, Torus } from "@react-three/drei"
+import { Text, useTexture } from "@react-three/drei" // Added useTexture
 import type * as THREE from "three"
 
 const projects = [
@@ -18,61 +18,80 @@ const projects = [
     id: "uba-website",
     name: "UBA College Website",
     type: "planet",
-    position: [4, 2, -2],
-    color: "#00ff88",
-    size: 0.8,
+    position: [-4.5, 2.5, -2], // Adjusted position
+    color: "#ff66aa", // Pinkish hue
+    size: 1.0, // Adjusted size
     description: "Dynamic website showcasing rural development projects under UBA initiative",
     tech: ["HTML", "CSS", "JavaScript", "PHP", "MySQL"],
     link: "https://uba.stvincentngp.edu.in/",
     github: "https://github.com/Mrsam2/uba-website",
+    texturePath: "/images/planet-pink-porous.png", // New texture
   },
   {
     id: "vector-lab",
     name: "Vector-Lab Website",
     type: "planet",
-    position: [-3, 1, 3],
-    color: "#ff6b6b",
-    size: 0.7,
+    position: [4, 2, 0], // Adjusted position
+    color: "#ffaa00", // Orange hue
+    size: 0.9, // Adjusted size
     description: "Responsive corporate website showcasing IT solutions and digital services",
     tech: ["HTML", "CSS", "JavaScript", "Bootstrap", "Firebase"],
     link: "https://web1.vectorlab.in/site2/",
     github: "https://github.com/Mrsam2/vector-lab",
+    texturePath: "/images/planet-orange-cratered.png", // New texture
   },
   {
     id: "gram-arogya",
     name: "Gram Arogya Seva App",
-    type: "star",
-    position: [2, -3, 1],
-    color: "#4ecdc4",
-    size: 0.6,
+    type: "planet", // Changed to planet
+    position: [0, -2, 3], // Adjusted position
+    color: "#00cc99", // Teal hue
+    size: 0.8, // Adjusted size
     description: "Telemedicine app for rural healthcare with appointment booking and virtual consultations",
     tech: ["Flutter", "Firebase", "Dart"],
     link: "https://github.com/Mrsam2/Gram-Arogya-Seva-App",
     github: "https://github.com/Mrsam2/Gram-Arogya-Seva-App",
+    texturePath: "/images/planet-teal-wavy.png", // New texture
   },
   {
     id: "infinity-event",
     name: "Infinity Event Website",
-    type: "asteroid",
-    position: [-2, 3, -1],
-    color: "#ffd93d",
-    size: 0.5,
+    type: "planet", // Changed to planet
+    position: [3, -1, -3], // Adjusted position
+    color: "#ff3399", // Deep pink hue
+    size: 0.7, // Adjusted size
     description: "Professional website for major technical event organized by college department",
     tech: ["HTML", "CSS", "JavaScript", "Bootstrap"],
     link: "https://infinity2024.vercel.app/",
     github: "https://github.com/Mrsam2/infinity-event",
+    texturePath: "/images/planet-pink-wavy.png", // New texture
   },
   {
     id: "insight-event",
     name: "Insight Event Website",
-    type: "asteroid",
-    position: [3, -1, -3],
-    color: "#a8e6cf",
-    size: 0.5,
+    type: "planet", // Changed to planet
+    position: [-2.5, -3.5, 1.5], // Adjusted position
+    color: "#6699ff", // Blue hue
+    size: 0.75, // Adjusted size
     description: "Professional website for major cultural event organized by college department",
     tech: ["HTML", "CSS", "JavaScript", "Bootstrap"],
     link: "https://infinity-event2024.vercel.app/",
     github: "https://github.com/Mrsam2/insight-event",
+    texturePath: "/images/planet-blue-striped.png", // New texture
+  },
+  // Added a placeholder for the purple cratered planet, not tied to a project in the current UI screenshot
+  {
+    id: "mystery-planet",
+    name: "Mystery Planet",
+    type: "planet",
+    position: [5, -4, -1], // Example position, outside main cluster
+    color: "#9933ff", // Purple hue
+    size: 0.6,
+    description: "A mysterious planet floating in the void.",
+    tech: ["Unknown"],
+    link: "#",
+    github: "#",
+    texturePath: "/images/planet-purple-cratered.png", // New texture
   },
 ]
 
@@ -85,32 +104,25 @@ const skills = [
   { name: "Firebase", position: [2, 0, 3], color: "#ffca28", proficiency: 0.7 },
 ]
 
-function CelestialObject({ project, onClick }: { project: any; onClick: (project: any) => void }) {
+function CelestialObject({
+  project,
+  onClick,
+  isMobile,
+}: { project: any; onClick: (project: any) => void; isMobile: boolean }) {
   const meshRef = useRef<THREE.Mesh>(null)
   const [hovered, setHovered] = useState(false)
+  const texture = useTexture(project.texturePath) // Load the texture
 
   useFrame((state) => {
     if (meshRef.current) {
-      meshRef.current.rotation.y += 0.01
-      meshRef.current.rotation.x += 0.005
-
-      // Floating animation
-      meshRef.current.position.y = project.position[1] + Math.sin(state.clock.elapsedTime + project.position[0]) * 0.2
+      meshRef.current.rotation.y += 0.005 // Slower rotation
+      // Floating animation - only apply if not on mobile
+      if (!isMobile) {
+        meshRef.current.position.y =
+          project.position[1] + Math.sin(state.clock.elapsedTime + project.position[0]) * 0.05 // Subtler float
+      }
     }
   })
-
-  const geometry = useMemo(() => {
-    switch (project.type) {
-      case "planet":
-        return <Sphere args={[project.size, 32, 32]} />
-      case "star":
-        return <Box args={[project.size, project.size, project.size]} />
-      case "asteroid":
-        return <Torus args={[project.size * 0.6, project.size * 0.3, 8, 16]} />
-      default:
-        return <Sphere args={[project.size, 32, 32]} />
-    }
-  }, [project.type, project.size])
 
   return (
     <group position={project.position}>
@@ -119,37 +131,32 @@ function CelestialObject({ project, onClick }: { project: any; onClick: (project
         onClick={() => onClick(project)}
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
-        scale={hovered ? 1.2 : 1}
+        scale={hovered ? 1.1 : 1} // Slightly reduced hover scale
       >
-        {geometry}
+        <sphereGeometry args={[project.size, 64, 64]} /> {/* Increased segments for smoother sphere */}
         <meshStandardMaterial
-          color={project.color}
+          map={texture} // Apply the loaded texture
+          metalness={0.6} // Glossy look
+          roughness={0.4} // Less rough
           emissive={project.color}
-          emissiveIntensity={hovered ? 0.3 : 0.1}
-          roughness={0.3}
-          metalness={0.7}
+          emissiveIntensity={hovered ? 0.2 : 0.1} // Increased emissive intensity for brighter glow
         />
       </mesh>
 
-      {/* Project name label */}
+      {/* Project name label - only show on hover */}
       <Text
-        position={[0, project.size + 0.5, 0]}
+        position={[0, project.size + 0.3, 0]} // Adjusted position for text
         fontSize={0.2}
         color="white"
         anchorX="center"
         anchorY="middle"
         visible={hovered}
+        material-toneMapped={false} // Prevent color shift
       >
         {project.name}
       </Text>
 
-      {/* Orbital ring for planets */}
-      {project.type === "planet" && (
-        <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[project.size + 0.3, 0.02, 8, 32]} />
-          <meshBasicMaterial color={project.color} opacity={0.3} transparent />
-        </mesh>
-      )}
+      {/* Orbital ring removed as per new design */}
     </group>
   )
 }
@@ -199,10 +206,10 @@ export default function GalaxyScene({
 
   return (
     <>
-      {/* Central Sun (Personal Brand) */}
+      {/* Central Sun (Personal Brand) - Maintained */}
       <mesh position={[0, 0, 0]}>
         <sphereGeometry args={[isMobile ? 0.8 : 1, 32, 32]} />
-        <meshStandardMaterial color="#ff6b35" emissive="#ff6b35" emissiveIntensity={0.5} />
+        <meshStandardMaterial color="#ffaa00" emissive="#ffffcc" emissiveIntensity={2.5} />
       </mesh>
 
       <Text
@@ -215,12 +222,12 @@ export default function GalaxyScene({
         SAURABH WANKHEDE
       </Text>
 
-      {/* Projects as celestial objects */}
+      {/* Projects as celestial objects with new textures */}
       {mobileProjects.map((project) => (
-        <CelestialObject key={project.id} project={project} onClick={onProjectClick} />
+        <CelestialObject key={project.id} project={project} onClick={onProjectClick} isMobile={isMobile} />
       ))}
 
-      {/* Skills constellation */}
+      {/* Skills constellation - Maintained */}
       {mobileSkills.map((skill, index) => (
         <SkillConstellation key={index} skill={skill} />
       ))}
