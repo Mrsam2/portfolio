@@ -208,7 +208,7 @@ export default function GalaxyScene({
       {/* Central Sun (Personal Brand) - Maintained */}
       <mesh position={[0, 0, 0]}>
         <sphereGeometry args={[isMobile ? 0.8 : 1, 32, 32]} />
-        <meshStandardMaterial color="#ffaa00" emissive="#ffffcc" emissiveIntensity={2.5} />
+        <meshStandardMaterial color="#ff9100ff" emissive="#FFD700" emissiveIntensity={5} />
       </mesh>
 
       <Text
